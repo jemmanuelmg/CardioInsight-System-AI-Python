@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-#from tkinter import Tk, Frame, Label, Entry, Radiobutton
+import tkinter as tk
 from tkinter import *
+from tkinter import ttk
 from sklearn.svm import SVC
 from sklearn import svm
 from sklearn import metrics
@@ -34,6 +35,7 @@ print(clf.predict([[34,0,1,118,210,0,1,192,0,0.7,2,0,2]])) #Si
 root = Tk()
 
 gender = StringVar(root, '1') 
+angina = StringVar(root)
 
 root.title('Predictor de Enfermedades del Corazon')
 #root.resizable(False, False)
@@ -59,7 +61,7 @@ container_frame = Frame(main_frame, bg='yellow')
 
 
 left_frame = Frame(container_frame, bg='green', width=550, height=400, padx=15, pady=15)
-
+##
 age_subframe = Frame(left_frame)
 
 label_age = Label(age_subframe, text="Edad:", anchor='w')
@@ -71,6 +73,25 @@ entry_age.grid(row=0, column=1, sticky='we')
 age_subframe.grid_columnconfigure(0, weight=1)
 age_subframe.grid_columnconfigure(1, weight=1)
 age_subframe.pack(fill='x', expand=True, pady=(0, 10))
+##
+
+##
+angina_subframe = Frame(left_frame)
+
+label_angina = Label(angina_subframe, text="Tipo de Dolor Pectoral:", anchor='w', justify='left')
+label_angina.grid(row=0, column=0, sticky="we", padx=(0, 8))
+
+combobox_angina = ttk.Combobox(angina_subframe, width = 32, textvariable = angina, state="readonly")
+combobox_angina['values'] = ('Angina Típica',  
+	                         'Angina Atípica', 
+	                         'Dolor No-Anginal', 
+	                         'Asintomático') 
+combobox_angina.grid(row=0, column=1, sticky='we')
+
+angina_subframe.grid_columnconfigure(0, weight=1)
+angina_subframe.grid_columnconfigure(1, weight=1)
+angina_subframe.pack(fill='x', expand=True, pady=(0, 10))
+##
 
 left_frame.grid(row=0, column=0, sticky='nsew')
 
@@ -80,6 +101,7 @@ left_frame.grid(row=0, column=0, sticky='nsew')
 
 right_frame = Frame(container_frame, bg='blue', width=550, height=400, padx=15, pady=15)
 
+##
 gender_subframe = Frame(right_frame)
 
 label_gender = Label(gender_subframe, text="Género: ", anchor='w')
@@ -98,6 +120,21 @@ radiobtn_subframe1.grid(row=0, column=1, sticky='we')
 gender_subframe.grid_columnconfigure(0, weight=1)
 gender_subframe.grid_columnconfigure(1, weight=1)
 gender_subframe.pack(fill='x', expand=True, pady=(0, 10))
+##
+
+##
+blood_pressure_subframe = Frame(left_frame)
+
+label_bloodp = Label(blood_pressure_subframe, text="Presión Arterial En Reposo (mm Hg):", anchor='w')
+label_bloodp.grid(row=0, column=0, sticky="we", padx=(0, 8))
+
+entry_bloodp = Entry(blood_pressure_subframe)
+entry_bloodp.grid(row=0, column=1, sticky='we')
+
+blood_pressure_subframe.grid_columnconfigure(0, weight=1)
+blood_pressure_subframe.grid_columnconfigure(1, weight=1)
+blood_pressure_subframe.pack(fill='x', expand=True, pady=(0, 10))
+##
 
 right_frame.grid(row=0, column=1, sticky='nsew')
 
