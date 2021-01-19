@@ -1,15 +1,9 @@
-from tkinter import *
+from tkinter import *      
+from PIL import ImageTk,Image  
 
-print('age', entry_age.get())
-print('gender', gender.get())
-print('angina', angina_map.get(angina.get()))
-print('bloodp', entry_bloodp.get())
-print('cholesterol', entry_cholesterol.get())
-print('sugar', entry_sugar.get())
-print('electrocardio', electrocardio_map.get(electrocardio.get()))
-print('heartrate', entry_heartrate.get())
-print('anginapain', anginapain.get())
-print('st_depression', entry_st_depression.get())
-print('slope', slope_map.get(slope_val.get()))
-print('flourosopy', flourosopy.get())
-print('thalium', thalium.get())
+root = Tk()  
+canvas = Canvas(root, width = 300, height = 300)  
+canvas.pack()  
+img = ImageTk.PhotoImage(Image.open("ball.png"))  
+canvas.create_image(20, 20, anchor=NW, image=img) 
+root.mainloop() 
