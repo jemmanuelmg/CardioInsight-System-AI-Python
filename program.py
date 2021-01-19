@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -93,18 +94,21 @@ def predict_result():
 	thal = thalium.get()
 
 	final_prediction = clf.predict([[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
+	prediction_accuracy = clf.score(x_test, y_test) * 100
+	accuracy_value['text'] = str(prediction_accuracy)[:5] + '%'
+
 	if final_prediction == 0:
-		final_prediction = "Positivo"
+		prediction_value['text'] = 'Negativo'
+		prediction_value['fg'] = '#4BCA81'
+		accuracy_value['fg'] = '#4BCA81'
 	else:
-		final_prediction = "Negativo"
-
-	preduction_accuracy = clf.score(x_test, y_test)
-
-	print('>>> Resultado final: ', final_prediction)
-
+		prediction_value['text'] = 'Positivo'
+		prediction_value['fg'] = '#C23934'
+		accuracy_value['fg'] = '#C23934'
 
 
 def validate_inputs():
+
 	is_valid = True
 	errors = ''
 
@@ -212,12 +216,65 @@ def validate_inputs():
 	if not is_valid:
 		#label_validation['text'] = errors
 		messagebox.showerror(message=errors, title="Información Suministrada No Valida")
+		return False
 	else:
+		return True
+
+
+def show_help():
+	pass
+
+
+def show_about_info():
+	pass
+
+
+def start_progress_bar():
+
+	form_valid = validate_inputs()
+	if form_valid:
+
+		progress_bar.pack()
+
+		for x in range(25):
+			progress_bar['value'] += 10
+			root.update_idletasks()
+			time.sleep(0.5)
+
+		#predict_result()
+
+		progress_bar['value'] = 0
+		progress_bar.pack_forget()
+
 		predict_result()
 
 
 
+
+
+
+
+
+
 root.title('Pronóstico Enfermedad del Corazon')
+root.iconbitmap('img/program-icon.ico')
+
+main_menu = Menu(root)
+root.config(menu=main_menu)
+
+file_menu = Menu(main_menu, tearoff=0)
+file_menu.add_command(label='Salir', command=root.quit)
+main_menu.add_cascade(label='Archivo', menu=file_menu)
+
+help_menu = Menu(main_menu, tearoff=0)
+help_menu.add_command(label='Mostrar Ayuda', command=show_help)
+main_menu.add_cascade(label='Ayuda', menu=help_menu)
+
+
+about_menu = Menu(main_menu, tearoff=0)
+about_menu.add_command(label='Acerca De...', command=show_about_info)
+main_menu.add_cascade(label='Información', menu=about_menu)
+
 # root.resizable(False, False)
 
 window_height = 670
@@ -506,7 +563,7 @@ right_frame.grid(row=0, column=1, sticky='nsew')
 
 container_frame.grid_columnconfigure(0, weight=1)
 container_frame.grid_columnconfigure(1, weight=1)
-container_frame.pack(fill="x", pady=10, padx=10)
+container_frame.pack(fill="x", pady=(10, 7), padx=10)
 
 
 
@@ -517,10 +574,13 @@ container_frame.pack(fill="x", pady=10, padx=10)
 
 
 
-main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=validate_inputs, font=normal_font)
-main_button.pack(pady=(5, 5))
+#main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=validate_inputs, font=normal_font)
+main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=start_progress_bar, font=normal_font)
+main_button.pack()
 
-results_frame = LabelFrame(main_frame, text='Resultados del Pronóstico', relief=RIDGE, padx=15, pady=15, font=normal_font)
+progress_bar = ttk.Progressbar(main_frame, orient=HORIZONTAL, length=300, mode='indeterminate')
+
+results_frame = LabelFrame(main_frame, text='Resultados del Pronóstico', relief=RIDGE, padx=15, pady=7, font=normal_font)
 
 prediction_label = Label(results_frame, text='¿Paciente Presenta Enfermedad del Corazón?', font=normal_font)
 prediction_label.grid(row=0, column=0, sticky="we")
@@ -531,19 +591,13 @@ accuracy_label.grid(row=0, column=1, sticky="we")
 actions_label = Label(results_frame, text='Acciónes', font=normal_font)
 actions_label.grid(row=0, column=2, sticky="we")
 
-prediction_color = ''
-if final_prediction == 'Negativo':
-	prediction_color = '#4BCA81'
-else:
-	prediction_color = '#C23934'
-
 
 #prediction_value = Label(results_frame, text=final_prediction, bg='#4BCA81')
-prediction_value = Label(results_frame, text='Negativo', fg='#4BCA81', font=normal_font_bold)
+prediction_value = Label(results_frame, text='-', font=normal_font_bold)
 prediction_value.grid(row=1, column=0, sticky="we")
 
 #accuracy_value = Label(results_frame, text=str(prediction_accuracy), bg='#4BCA81')
-accuracy_value = Label(results_frame, text='90.87%', fg='#4BCA81', font=normal_font_bold)
+accuracy_value = Label(results_frame, text='-', font=normal_font_bold)
 accuracy_value.grid(row=1, column=1, sticky="we")
 
 export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font)
@@ -554,6 +608,11 @@ results_frame.grid_columnconfigure(1, weight=1)
 results_frame.grid_columnconfigure(2, weight=1)
 
 results_frame.pack(fill="x", pady=10, padx=10)
+
+
+
+
+
 
 
 
