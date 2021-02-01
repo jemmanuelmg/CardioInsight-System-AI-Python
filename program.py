@@ -1,4 +1,5 @@
 import time
+import io
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -17,6 +18,9 @@ from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from PIL import ImageTk, Image
+from PyPDF2 import PdfFileWriter, PdfFileReader
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 root = Tk()
 gender = StringVar(root, '1')
@@ -324,8 +328,41 @@ def start_progress_bar():
 		predict_result()
 
 def save_as_pdf():
-	directory_route = filedialog.askdirectory()
-	print('>>> The directory chosen is: ', directory_route)
+
+	is_form_valid = validate_inputs()
+
+	if is_form_valid :
+
+		patient_name = entry_patientname.get()
+		patient_id = entry_patientid.get()
+
+		directory_route = filedialog.askdirectory()
+		packet = io.BytesIO()
+
+		# create a new PDF with Reportlab
+		can = canvas.Canvas(packet, pagesize=letter)
+		can.drawString(10, 100, "Hello world")
+		can.save()
+
+		#move to the beginning of the StringIO buffer
+		packet.seek(0)
+		new_pdf = PdfFileReader(packet)
+
+		# read your existing PDF
+		existing_pdf = PdfFileReader(open("docs/PDF_Template_Base.pdf", "rb"))
+		output = PdfFileWriter()
+
+		# add the "watermark" (which is the new pdf) on the existing page
+		page = existing_pdf.getPage(0)
+		page.mergePage(new_pdf.getPage(0))
+		output.addPage(page)
+
+		# finally, write "output" to a real file
+		outputStream = open(directory_route + '/Resultados ' + patient_name + ' ' + patient_id + '.pdf', "wb")
+		output.write(outputStream)
+		outputStream.close()
+
+		messagebox.showinfo('Información','Los resultados fueron exportados correctamente')
 
 
 
@@ -334,7 +371,7 @@ def save_as_pdf():
 
 
 
-# Elemento raíz de la ventana y menús superiores
+# Configuración del elemento raíz de la ventana y menús superiores
 root.title('Pronóstico Enfermedad del Corazon')
 root.iconbitmap('img/program-icon.ico')
 
@@ -354,19 +391,16 @@ about_menu = Menu(main_menu, tearoff=0)
 about_menu.add_command(label='Acerca De...', command=show_about_info)
 main_menu.add_cascade(label='Información', menu=about_menu)
 
-# root.resizable(False, False)
+root.state('zoomed')
 
-window_height = 670
-window_width = 1300
 
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
 
-x_cordinate = int((screen_width/2) - (window_width/2))
-y_cordinate = int((screen_height/2) - (window_height/2))
 
-root.geometry('{}x{}+{}+{}'.format(window_width, window_height, x_cordinate, y_cordinate))
 
+
+
+
+#Frame principal (contenedor de todos los elementos)
 main_frame = Frame(root)
 main_frame.pack(fill='both', expand=True)
 
