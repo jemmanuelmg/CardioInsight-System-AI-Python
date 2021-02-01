@@ -107,12 +107,17 @@ def predict_result():
 		prediction_value['fg'] = '#C23934'
 		accuracy_value['fg'] = '#C23934'
 
+	# Habilitar el boton para exportar resultados a pdf
+	export_pdf_button['state'] = 'normal'
+
 
 def validate_inputs():
 
 	is_valid = True
 	errors = ''
 
+	patient_name = entry_patientname.get()
+	patient_id = entry_patientid.get()
 	age = entry_age.get()
 	angina_val = angina_map.get(angina.get())
 	bloodp = entry_bloodp.get()
@@ -125,6 +130,22 @@ def validate_inputs():
 	slope = slope_map.get(slope_val.get())
 	flourosopy_val = flourosopy.get()
 	thalium_val = thalium.get()
+
+	#Validación nombre del paciente
+	if not patient_name:
+		errors += "- Por favor complete el campo 'Nombres del Paciente' \n\n"
+		is_valid = False
+		label_patientname['fg'] = 'red'
+	else:
+		label_patientname['fg'] = 'black'
+
+	# Validacion identificación del paciente
+	if not patient_id:
+		errors += "- Por favor complete el campo 'Identificación del Paciente' \n\n"
+		is_valid = False
+		label_patientid['fg'] = 'red'
+	else:
+		label_patientid['fg'] = 'black'
 
 	# Validacion edad
 	if age is None:
@@ -284,6 +305,10 @@ def show_about_info():
 def start_progress_bar():
 
 	form_valid = validate_inputs()
+
+	prediction_value['text'] = '-'
+	accuracy_value['text'] = '-'
+
 	if form_valid:
 
 		progress_bar.pack()
@@ -292,8 +317,6 @@ def start_progress_bar():
 			progress_bar['value'] += 10
 			root.update_idletasks()
 			time.sleep(0.1)
-
-		#predict_result()
 
 		progress_bar['value'] = 0
 		progress_bar.pack_forget()
@@ -311,7 +334,7 @@ def save_as_pdf():
 
 
 
-
+# Elemento raíz de la ventana y menús superiores
 root.title('Pronóstico Enfermedad del Corazon')
 root.iconbitmap('img/program-icon.ico')
 
@@ -356,7 +379,7 @@ container_frame = LabelFrame(main_frame, text='Datos del Paciente', relief=RIDGE
 
 
 
-
+# Frame header del título e imágenes
 header_frame = Frame(main_frame)
 
 medicine_logo_canvas = Canvas(header_frame, width=95, height=95)
@@ -376,7 +399,7 @@ header_frame.grid_columnconfigure(0, weight=1)
 header_frame.grid_columnconfigure(1, weight=1)
 header_frame.grid_columnconfigure(2, weight=1)
 
-header_frame.pack(fill="x", padx=15, pady=15)
+header_frame.pack(fill="x", padx=15, pady=9)
 
 
 
@@ -385,8 +408,9 @@ header_frame.pack(fill="x", padx=15, pady=15)
 
 
 
-
+# Panel de inputs lado izquierdo
 left_frame = Frame(container_frame, width=550, height=400, padx=15, pady=15)
+
 ##
 age_subframe = Frame(left_frame)
 
@@ -516,8 +540,36 @@ left_frame.grid(row=0, column=0, sticky='nsew')
 
 
 
-
+# Panel de inputs lado derecho
 right_frame = Frame(container_frame, width=550, height=400, padx=15, pady=15)
+
+##
+patientname_subframe = Frame(right_frame)
+
+label_patientname = Label(patientname_subframe, text="Nombres del Paciente:", anchor='w', font=normal_font)
+label_patientname.grid(row=0, column=0, sticky="we", padx=(0, 8))
+
+entry_patientname = Entry(patientname_subframe)
+entry_patientname.grid(row=0, column=1, sticky='we')
+
+patientname_subframe.grid_columnconfigure(0, weight=1)
+patientname_subframe.grid_columnconfigure(1, weight=1)
+patientname_subframe.pack(fill='x', expand=True, pady=(0, 10))
+##
+
+##
+patientid_subframe = Frame(right_frame)
+
+label_patientid = Label(patientid_subframe, text="Identificación del Paciente:", anchor='w', font=normal_font)
+label_patientid.grid(row=0, column=0, sticky="we", padx=(0, 8))
+
+entry_patientid = Entry(patientid_subframe)
+entry_patientid.grid(row=0, column=1, sticky='we')
+
+patientid_subframe.grid_columnconfigure(0, weight=1)
+patientid_subframe.grid_columnconfigure(1, weight=1)
+patientid_subframe.pack(fill='x', expand=True, pady=(0, 10))
+##
 
 ##
 gender_subframe = Frame(right_frame)
@@ -630,7 +682,7 @@ container_frame.pack(fill="x", pady=(10, 7), padx=10)
 
 
 
-#main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=validate_inputs, font=normal_font)
+# Botones, barra de progreso y panel de resultados (zona inferior)
 main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=start_progress_bar, font=normal_font)
 main_button.pack()
 
@@ -656,7 +708,7 @@ prediction_value.grid(row=1, column=0, sticky="we")
 accuracy_value = Label(results_frame, text='-', font=normal_font_bold)
 accuracy_value.grid(row=1, column=1, sticky="we")
 
-export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf)
+export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf, state='disabled')
 export_pdf_button.grid(row=1, column=2, sticky="we")
 
 results_frame.grid_columnconfigure(0, weight=1)
@@ -672,7 +724,7 @@ results_frame.pack(fill="x", pady=10, padx=10)
 
 
 
-
+# Ejecutar la ventana en un ciclo infinito
 root.mainloop()
 
 
