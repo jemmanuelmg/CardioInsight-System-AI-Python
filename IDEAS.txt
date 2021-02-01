@@ -1,8 +1,0 @@
-poner una barra de progreso y quitarla dinamicamente, para hacer parecer que el programa 
-toma tiempo para procesar
-
-Poner un menu superior con opciones de: Ayuda, Salir y Acerca De
-
-Hacer un instalador automatico
-
-Exportar resultados a PDF
