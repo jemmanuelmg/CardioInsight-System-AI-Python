@@ -7,6 +7,7 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
 from tkinter.font import Font
 from sklearn.svm import SVC
 from sklearn import svm
@@ -125,96 +126,147 @@ def validate_inputs():
 	flourosopy_val = flourosopy.get()
 	thalium_val = thalium.get()
 
+	# Validacion edad
 	if age is None:
 		errors += "- Por favor complete el campo Edad \n\n"
 		is_valid = False
+		label_age['fg'] = 'red'
 	else:
 		try:
 			int(age)
+			label_age['fg'] = 'black'
 		except ValueError:
 			is_valid = False
 			errors += "- El valor del campo Edad no es válido. Por favor ingrese un numero entero \n\n"
+			label_age['fg'] = 'red'
+			entry_age.delete(0, 'end')
 
+	# Validacion angina
 	if angina_val is None:
 		errors += "- Por favor complete el campo 'Tipo de Dolor Pectoral' \n\n"
 		is_valid = False
+		label_angina['fg'] = 'red'
+	else:
+		label_angina['fg'] = 'black'
 
+	#Validacion Presión Arterial en Reposo
 	if bloodp is None:
 		errors += "- Por favor complete el campo 'Presión Arterial en Reposo' \n\n"
 		is_valid = False
+		label_bloodp['fg'] = 'red'
 	else:
 		try:
 			int(bloodp)
+			label_bloodp['fg'] = 'black'
 		except ValueError:
 			is_valid = False
 			errors += "- El valor del campo 'Presión Arterial en Reposo' no es válido. Por favor ingrese un numero entero \n\n"
+			label_bloodp['fg'] = 'red'
+			entry_bloodp.delete(0, 'end')
 
+	# Validacion Colesterol Sérico
 	if cholesterol is None:
 		errors += "- Por favor complete el campo 'Colesterol Sérico' \n\n"
 		is_valid = False
+		label_cholesterol['fg'] = 'red'
 	else:
 		try:
 			int(cholesterol)
+			label_cholesterol['fg'] = 'black'
 		except ValueError:
 			is_valid = False
 			errors += "- El valor del campo 'Colesterol Sérico' no es válido. Por favor ingrese un numero entero \n\n"
+			label_cholesterol['fg'] = 'red'
+			entry_cholesterol.delete(0, 'end')
 
+	#Validación Nivel de Azúcar en Ayunas
 	if sugar is None:
 		errors += "- Por favor complete el campo 'Nivel de Azúcar en Ayunas' \n\n"
 		is_valid = False
+		label_sugar['fg'] = 'red'
 	else:
 		try:
 			float(sugar)
+			label_sugar['fg'] = 'black'
 		except ValueError:
 			is_valid = False
 			errors += "- El valor del campo 'Nivel de Azúcar en Ayunas' no es válido. Por favor ingrese un numero entero o decimal con punto \n\n"
+			label_sugar['fg'] = 'red'
+			entry_sugar.delete(0, 'end')
 
-	if electrocardio_val is None:
+	#Valicación Resultados Electrocardiográficos en Reposo
+	if not electrocardio_val:
 		errors += "- Por favor complete el campo 'Resultados Electrocardiográficos en Reposo' \n\n"
 		is_valid = False
+		label_electrocardio['fg'] = 'red'
+	else:
+		label_electrocardio['fg'] = 'black'
 
+	#Validación Frecuencia Cardíaca Máxima
 	if heartrate is None:
 		errors += "- Por favor complete el campo 'Frecuencia Cardíaca Máxima' \n\n"
 		is_valid = False
+		label_heartrate['fg'] = 'red'
 	else:
 		try:
 			int(heartrate)
+			label_heartrate['fg'] = 'black'
 		except ValueError:
 			is_valid = False
 			errors += "- El valor del campo 'Frecuencia Cardíaca Máxima' no es válido. Por favor ingrese un numero entero \n\n"
+			label_heartrate['fg'] = 'red'
+			entry_heartrate.delete(0, 'end')
 
+	#Validación ¿Angina Inducida por el Ejercicio?
 	if anginapain_val is None:
 		errors += "- Por favor complete el campo '¿Angina Inducida por el Ejercicio?' \n\n"
 		is_valid = False
+		label_anginapain['fg'] = 'red'
+	else:
+		label_anginapain['fg'] = 'black'
 
+	#Validación Depresión de Onda ST Inducida por Ejercicio
 	if st_depression is None:
 		errors += "- Por favor complete el campo 'Depresión de Onda ST Inducida por Ejercicio' \n\n"
 		is_valid = False
+		label_st_depression['fg'] = 'red'
 	else:
 		try:
 			float(st_depression)
+			label_st_depression['fg'] = 'black'
 		except ValueError:
 			is_valid = False
 			errors += "- El valor del campo 'Depresión de Onda ST Inducida por Ejercicio' no es válido. Por favor ingrese un numero entero o decimal con punto \n\n"
+			label_st_depression['fg'] = 'red'
+			entry_st_depression.delete(0, 'end')
 
+	#Validación Pendiente del Segmento ST Durante Pico de Ejercicio
 	if slope is None:
 		errors += "- Por favor complete el campo 'Pendiente del Segmento ST Durante Pico de Ejercicio' \n\n"
 		is_valid = False
+		label_slope['fg'] = 'red'
+	else:
+		label_slope['fg'] = 'black'
 
-	try:
-		int(flourosopy_val)
-	except ValueError:
-		is_valid = False
+	#Validación Número de Vasos Principales Coloreados por la Floración
+	if not flourosopy_val:
 		errors += "- Por favor complete el campo 'Número de Vasos Principales Coloreados por la Floración' \n\n"
-
+		is_valid = False
+		label_flourosopy['fg'] = 'red'
+	else:
+		label_flourosopy['fg'] = 'black'
+	
+	#Validación Resultado Prueba de Estrés con Talio
 	try:
 		int(thalium_val)
+		label_thalium['fg'] = 'black'
 	except ValueError:
 		is_valid = False
 		errors += "- Por favor complete el campo 'Resultado Prueba de Estrés con Talio' \n\n"
+		label_thalium['fg'] = 'red'
 
+	#Retornar validez final de todos los inputs
 	if not is_valid:
-		#label_validation['text'] = errors
 		messagebox.showerror(message=errors, title="Información Suministrada No Valida")
 		return False
 	else:
@@ -239,7 +291,7 @@ def start_progress_bar():
 		for x in range(25):
 			progress_bar['value'] += 10
 			root.update_idletasks()
-			time.sleep(0.5)
+			time.sleep(0.1)
 
 		#predict_result()
 
@@ -247,6 +299,10 @@ def start_progress_bar():
 		progress_bar.pack_forget()
 
 		predict_result()
+
+def save_as_pdf():
+	directory_route = filedialog.askdirectory()
+	print('>>> The directory chosen is: ', directory_route)
 
 
 
@@ -417,7 +473,7 @@ anginapain_subframe.pack(fill='x', expand=True, pady=(0, 10))
 ##
 slope_subframe = Frame(left_frame)
 
-label_slope = Label(slope_subframe, text="Pendiente Del Segmento ST Durante Pico De Ejercicio:", anchor='w', justify='left', font=normal_font)
+label_slope = Label(slope_subframe, text="Pendiente del Segmento ST Durante Pico de Ejercicio:", anchor='w', justify='left', font=normal_font)
 label_slope.grid(row=0, column=0, sticky="we", padx=(0, 8))
 
 combobox_slope = ttk.Combobox(slope_subframe, width = 32, textvariable = slope_val, state="readonly")
@@ -543,7 +599,7 @@ st_depression_subframe.pack(fill='x', expand=True, pady=(0, 10))
 ##
 flourosopy_subframe = Frame(right_frame)
 
-label_flourosopy = Label(flourosopy_subframe, text="Número De Vasos Principales Coloreados Por La Floración:", anchor='w', justify='left', font=normal_font)
+label_flourosopy = Label(flourosopy_subframe, text="Número de Vasos Principales Coloreados por la Floración:", anchor='w', justify='left', font=normal_font)
 label_flourosopy.grid(row=0, column=0, sticky="we", padx=(0, 8))
 
 combobox_flourosopy = ttk.Combobox(flourosopy_subframe, width = 32, textvariable = flourosopy, state="readonly")
@@ -600,7 +656,7 @@ prediction_value.grid(row=1, column=0, sticky="we")
 accuracy_value = Label(results_frame, text='-', font=normal_font_bold)
 accuracy_value.grid(row=1, column=1, sticky="we")
 
-export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font)
+export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf)
 export_pdf_button.grid(row=1, column=2, sticky="we")
 
 results_frame.grid_columnconfigure(0, weight=1)
