@@ -62,7 +62,7 @@ data = pd.read_csv('data/heart.csv')
 x = data.drop('target', axis=1)
 y = data.target
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.4, random_state=109)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=109)
 
 clf = make_pipeline(StandardScaler(), SVC(kernel='rbf', gamma=0.1, C=1.0))
 clf.fit(x_train, y_train)
@@ -220,7 +220,7 @@ def validate_inputs():
 			entry_sugar.delete(0, 'end')
 
 	#Valicación Resultados Electrocardiográficos en Reposo
-	if not electrocardio_val:
+	if electrocardio_val is None or electrocardio_val == '':
 		errors += "- Por favor complete el campo 'Resultados Electrocardiográficos en Reposo' \n\n"
 		is_valid = False
 		label_electrocardio['fg'] = 'red'
@@ -317,7 +317,7 @@ def start_progress_bar():
 
 		progress_bar.pack()
 
-		for x in range(25):
+		for _ in range(25):
 			progress_bar['value'] += 10
 			root.update_idletasks()
 			time.sleep(0.1)
@@ -354,8 +354,10 @@ def save_as_pdf():
 
 		# add the "watermark" (which is the new pdf) on the existing page
 		page = existing_pdf.getPage(0)
+		page2 = existing_pdf.getPage(1)
 		page.mergePage(new_pdf.getPage(0))
 		output.addPage(page)
+		output.addPage(page2)
 
 		# finally, write "output" to a real file
 		outputStream = open(directory_route + '/Resultados ' + patient_name + ' ' + patient_id + '.pdf', "wb")
