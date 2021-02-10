@@ -17,10 +17,13 @@ from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix
 from PIL import ImageTk, Image
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import cm
+from datetime import datetime
 
 root = Tk()
 gender = StringVar(root, '1')
@@ -52,20 +55,77 @@ slope_map = {
 	'Descendete (Signos de corazón enfermo)': 2
 }
 
+gender_map = {
+	'1': 'Masculino',
+	'0': 'Femenino'
+}
+
+angina_pain_map = {
+	'1': 'Sí',
+	'0': 'No'
+}
+
+# Fuentes del programa
 normal_font = Font(family='Raleway Medium', size=11)
 normal_font_bold = Font(family='Raleway Medium', weight='bold', size=14)
 medium_font = Font(family='Raleway Medium', size=14)
 large_font = Font(family='Raleway Medium', size=16)
 
+
+
+
+
+
+
+
+
+
+# Leer el dataset
 data = pd.read_csv('data/heart.csv')
 
+# Dividir el dataset entre: X son los registros y Y es la etiqueta
 x = data.drop('target', axis=1)
 y = data.target
 
+# Dividir otra vez X e Y entre datos de entrenamiento y datos de prueba
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=109)
 
+#Crear la SVM e ingresarle los datos X e Y de prueba
 clf = make_pipeline(StandardScaler(), SVC(kernel='rbf', gamma=0.1, C=1.0))
 clf.fit(x_train, y_train)
+
+# Guardar en esta variable todas las predicciones hechas sobre datos de prueba
+y_pred = clf.predict(x_train)
+
+# Crear matriz de confusion para obtener precision de la clasificación de cada etiqueta
+cm = confusion_matrix(y_train, y_pred)
+cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+
+confusion_matrix = np.array(cm);
+accuracy_positive = round(confusion_matrix[0][0], 4) * 100
+accuracy_negative = round(confusion_matrix[1][1], 4) * 100
+
+print('*** Matriz de confusion con scores')
+print(cm)
+print('*** Precision diagnostico positivo')
+print(accuracy_positive)
+print('*** Precision diagnostico negativo')
+print(accuracy_negative)
+
+'''
+print('*** El contenido de x_train')
+print(x_train)
+
+print(' ')
+
+print('*** El contenido de y_train')
+print(y_train)
+
+print(' ')
+
+print('*** La prediccion de todo el x_train')
+print(clf.predict(x_train))
+'''
 
 '''
 print('The score')
@@ -78,6 +138,7 @@ print(clf.predict([[34,0,1,118,210,0,1,192,0,0.7,2,0,2]])) #Si
 
 def predict_result():
 
+	# Obtener los valores a enviar a la SVM
 	age = entry_age.get()
 	sex = gender.get()
 	cp = angina_map.get(angina.get())
@@ -98,16 +159,26 @@ def predict_result():
 	ca = flourosopy.get()
 	thal = thalium.get()
 
+	# Obtener la clasificación usando clf.predict() y enviando los datos en orden
 	final_prediction = clf.predict([[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
-	prediction_accuracy = clf.score(x_test, y_test) * 100
-	accuracy_value['text'] = str(prediction_accuracy)[:5] + '%'
+	#prediction_accuracy = clf.score(x_test, y_test) * 100
+	#accuracy_value['text'] = str(prediction_accuracy)[:5] + '%'
 
+	# Si el resultado final es 0 (Negativo, no tiene la enfermedad)
 	if final_prediction == 0:
+
 		prediction_value['text'] = 'Negativo'
+		accuracy_value['text'] = accuracy_negative
+
 		prediction_value['fg'] = '#4BCA81'
 		accuracy_value['fg'] = '#4BCA81'
+
+	# Si el resultado final es 1 (Positivo, tiene la enfermedad)	
 	else:
+
 		prediction_value['text'] = 'Positivo'
+		accuracy_value['text'] = accuracy_positive
+
 		prediction_value['fg'] = '#C23934'
 		accuracy_value['fg'] = '#C23934'
 
@@ -331,40 +402,98 @@ def save_as_pdf():
 
 	is_form_valid = validate_inputs()
 
-	if is_form_valid :
+	# Verificar que todos los campos son validos antes de proceder
+	if is_form_valid:
 
-		patient_name = entry_patientname.get()
-		patient_id = entry_patientid.get()
-
+		# Obtener la ruta del directorio donde se guardará el archivo
 		directory_route = filedialog.askdirectory()
-		packet = io.BytesIO()
 
-		# create a new PDF with Reportlab
-		can = canvas.Canvas(packet, pagesize=letter)
-		can.drawString(10, 100, "Hello world")
-		can.save()
+		# Si la ruta escogida no esta vacía, entonces
+		if directory_route != '':
 
-		#move to the beginning of the StringIO buffer
-		packet.seek(0)
-		new_pdf = PdfFileReader(packet)
+			# Resutado final y precision para escribir a pdf
+			result_val = prediction_value['text']
+			accuracy_val = accuracy_value['text']
 
-		# read your existing PDF
-		existing_pdf = PdfFileReader(open("docs/PDF_Template_Base.pdf", "rb"))
-		output = PdfFileWriter()
+			# Datos principales del paciente para escribir a pdf
+			patient_name = entry_patientname.get()
+			patient_id = entry_patientid.get()
+			current_date = str(datetime.date(datetime.now()))
 
-		# add the "watermark" (which is the new pdf) on the existing page
-		page = existing_pdf.getPage(0)
-		page2 = existing_pdf.getPage(1)
-		page.mergePage(new_pdf.getPage(0))
-		output.addPage(page)
-		output.addPage(page2)
+			#Datos medicos del paciente para escribir a pdf
+			age = entry_age.get()
+			gender_val = gender_map.get(gender.get())
+			angina_val = angina.get()
+			bloodp = entry_bloodp.get()
+			cholesterol = entry_cholesterol.get()
+			sugar = entry_sugar.get()
+			electrocardio_val = electrocardio.get()
+			heartrate = entry_heartrate.get()
+			anginapain_val = angina_pain_map.get(anginapain.get())
+			st_depression = entry_st_depression.get()
+			slope = slope_val.get()
+			flourosopy_val = flourosopy.get()
+			thalium_val = thalium.get()
 
-		# finally, write "output" to a real file
-		outputStream = open(directory_route + '/Resultados ' + patient_name + ' ' + patient_id + '.pdf', "wb")
-		output.write(outputStream)
-		outputStream.close()
+			packet = io.BytesIO()
 
-		messagebox.showinfo('Información','Los resultados fueron exportados correctamente')
+			# Crear un nuevo PDF con reportlab
+			can = canvas.Canvas(packet, pagesize=letter)
+
+			# Poner tipo de letra Times tamaño 12 y escribir datos
+			# El punto se ubica por defecto en la esquina inferior izq
+			can.setFont('Times-Roman', 12)
+			can.drawString(6*cm, 22*cm, patient_name)
+			can.drawString(6*cm, 21*cm, patient_id)
+			can.drawString(17.3*cm, 22*cm, current_date)
+
+			can.setFont('Times-Bold', 12)
+			can.drawString(4.587*cm, 19.569*cm, result_val)
+			can.drawString(4.587*cm, 18.412*cm, accuracy_val)
+
+			can.setFont('Times-Roman', 12)
+			can.drawString(11.25*cm, 16*cm, age)
+			can.drawString(11.25*cm, 15.3*cm, gender_val)
+			can.drawString(11.25*cm, 14.6*cm, angina_val)
+			can.drawString(11.25*cm, 13.9*cm, cholesterol)
+			can.drawString(11.25*cm, 13.11*cm, electrocardio_val)
+			can.drawString(11.25*cm, 12.32*cm, anginapain_val)
+			can.drawString(11.25*cm, 11.52*cm, slope)
+			can.drawString(11.25*cm, 10.16*cm, thalium_val)
+			can.drawString(11.25*cm, 9.37*cm, bloodp)
+			can.drawString(11.25*cm, 8.58*cm, sugar)
+			can.drawString(11.25*cm, 7.79*cm, heartrate)
+			can.drawString(11.25*cm, 7*cm, st_depression)
+			can.drawString(11.25*cm, 5.68*cm, flourosopy_val)
+
+			can.save()
+
+			packet.seek(0)
+			new_pdf = PdfFileReader(packet)
+
+			# Leer el PDF plantilla
+			existing_pdf = PdfFileReader(open("docs/PDF_Base.pdf", "rb"))
+			output = PdfFileWriter()
+
+			page = existing_pdf.getPage(0)
+			#page2 = existing_pdf.getPage(1)
+			page.mergePage(new_pdf.getPage(0))
+			output.addPage(page)
+			#output.addPage(page2)
+
+			# Guardar el archivo en la ruta seleccionada con el nombre e ID del paciente
+			outputStream = open(directory_route + '/Resultados ' + patient_name + ' ' + patient_id + '.pdf', "wb")
+			output.write(outputStream)
+			outputStream.close()
+
+			messagebox.showinfo(title='Información', message='Los resultados fueron exportados correctamente')
+
+		else:
+
+			# Si no se seleccionó ninguna ruta, mostrar mensaje de error
+			messagebox.showerror(title='Datos no exportados', message='No se ha seleccionado ninguna carpeta, porfavor seleccione un directorio válido')
+
+		
 
 
 
@@ -393,6 +522,7 @@ about_menu = Menu(main_menu, tearoff=0)
 about_menu.add_command(label='Acerca De...', command=show_about_info)
 main_menu.add_cascade(label='Información', menu=about_menu)
 
+# Configurar ventana para aparezca como pantalla completa
 root.state('zoomed')
 
 
@@ -736,15 +866,14 @@ actions_label = Label(results_frame, text='Acciónes', font=normal_font)
 actions_label.grid(row=0, column=2, sticky="we")
 
 
-#prediction_value = Label(results_frame, text=final_prediction, bg='#4BCA81')
 prediction_value = Label(results_frame, text='-', font=normal_font_bold)
 prediction_value.grid(row=1, column=0, sticky="we")
 
-#accuracy_value = Label(results_frame, text=str(prediction_accuracy), bg='#4BCA81')
 accuracy_value = Label(results_frame, text='-', font=normal_font_bold)
 accuracy_value.grid(row=1, column=1, sticky="we")
 
 export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf, state='disabled')
+#export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf)
 export_pdf_button.grid(row=1, column=2, sticky="we")
 
 results_frame.grid_columnconfigure(0, weight=1)
