@@ -67,7 +67,8 @@ angina_pain_map = {
 
 # Fuentes del programa
 normal_font = Font(family='Raleway Medium', size=11)
-normal_font_bold = Font(family='Raleway Medium', weight='bold', size=14)
+medium_font_bold = Font(family='Raleway Medium', weight='bold', size=14)
+normal_font_bold = Font(family='Raleway Medium', weight='bold', size=12)
 medium_font = Font(family='Raleway Medium', size=14)
 large_font = Font(family='Raleway Medium', size=16)
 
@@ -105,35 +106,20 @@ confusion_matrix = confusion_matrix.astype('float') / confusion_matrix.sum(axis=
 accuracy_positive = round(confusion_matrix[0][0], 4) * 100
 accuracy_negative = round(confusion_matrix[1][1], 4) * 100
 
+# Imprimir informacion de la matriz de confusion
+'''
 print('*** Matriz de confusion con scores')
 print(confusion_matrix)
 print('*** Precision diagnostico positivo')
 print(accuracy_positive)
 print('*** Precision diagnostico negativo')
 print(accuracy_negative)
-
-'''
-print('*** El contenido de x_train')
-print(x_train)
-
-print(' ')
-
-print('*** El contenido de y_train')
-print(y_train)
-
-print(' ')
-
-print('*** La prediccion de todo el x_train')
-print(clf.predict(x_train))
 '''
 
+# Imprimir informacion del score general de la SVM (sin discriminar por etiqueta)
 '''
 print('The score')
 print(clf.score(x_test, y_test))
-
-print('The first prediction')
-print(clf.predict([[52,1,0,125,212,0,1,168,0,1,2,2,3]])) #No
-print(clf.predict([[34,0,1,118,210,0,1,192,0,0.7,2,0,2]])) #Si
 '''
 
 def predict_result():
@@ -161,14 +147,13 @@ def predict_result():
 
 	# Obtener la clasificación usando clf.predict() y enviando los datos en orden
 	final_prediction = clf.predict([[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]])
-	#prediction_accuracy = clf.score(x_test, y_test) * 100
-	#accuracy_value['text'] = str(prediction_accuracy)[:5] + '%'
 
 	# Si el resultado final es 0 (Negativo, no tiene la enfermedad)
 	if final_prediction == 0:
 
-		prediction_value['text'] = 'Negativo'
-		accuracy_value['text'] = accuracy_negative
+		prediction_value['text'] = 'Negativo \n No ha sido detectado como enfermo del corazón'
+		prediction_value_forpdf['text'] = 'Negativo: No ha sido detectado como enfermo del corazón'
+		accuracy_value['text'] = str(accuracy_negative) + '%'
 
 		prediction_value['fg'] = '#4BCA81'
 		accuracy_value['fg'] = '#4BCA81'
@@ -176,8 +161,9 @@ def predict_result():
 	# Si el resultado final es 1 (Positivo, tiene la enfermedad)	
 	else:
 
-		prediction_value['text'] = 'Positivo'
-		accuracy_value['text'] = accuracy_positive
+		prediction_value['text'] = 'Positivo \n Alta probabilidad de sufrir enfermedad del corazón'
+		prediction_value_forpdf['text'] = 'Positivo: Alta probabilidad de sufrir enfermedad del corazón'
+		accuracy_value['text'] = str(accuracy_positive) + '%'
 
 		prediction_value['fg'] = '#C23934'
 		accuracy_value['fg'] = '#C23934'
@@ -403,17 +389,15 @@ def save_as_pdf():
 	is_form_valid = validate_inputs()
 
 	# Verificar que todos los campos son validos antes de proceder
-	#if is_form_valid:
-	if True:
+	if is_form_valid:
 
 		# Obtener la ruta del directorio donde se guardará el archivo
 		directory_route = filedialog.askdirectory()
 
-		# Si la ruta escogida no esta vacía, entonces
 		if directory_route != '':
 
 			# Resutado final y precision para escribir a pdf
-			result_val = prediction_value['text']
+			result_val = prediction_value_forpdf['text']
 			accuracy_val = accuracy_value['text']
 
 			# Datos principales del paciente para escribir a pdf
@@ -444,14 +428,11 @@ def save_as_pdf():
 			# El punto se ubica por defecto en la esquina inferior izq cada vez que se va a escribir algo
 			# Poner tipo de letra Times tamaño 12 y escribir datos
 			can.setFont('Times-Roman', 12)
-			#can.drawString(6*cm, 22*cm, patient_name)
 
-			
-			can.drawString(6*cm, 21*cm, 'GORREA HIJUEPUTA')
-			'''
+			can.drawString(6*cm, 22*cm, patient_name)
+			can.drawString(4.7*cm, 20.981*cm, patient_id)
 			can.drawString(17.3*cm, 22*cm, current_date)
 
-			# Poner tipo de letra Times tamaño 12 en negrilla y escribir datos
 			can.setFont('Times-Bold', 12)
 			can.drawString(4.587*cm, 19.569*cm, result_val)
 			can.drawString(4.587*cm, 18.412*cm, accuracy_val)
@@ -470,10 +451,10 @@ def save_as_pdf():
 			can.drawString(11.25*cm, 7.79*cm, heartrate)
 			can.drawString(11.25*cm, 7*cm, st_depression)
 			can.drawString(11.25*cm, 5.68*cm, flourosopy_val)
-			'''
 
 			can.save()
 
+			# Crear un PdfFileReader con las lineas escritas guardadas dentro del packet 
 			packet.seek(0)
 			new_pdf = PdfFileReader(packet)
 
@@ -871,15 +852,16 @@ accuracy_label.grid(row=0, column=1, sticky="we")
 actions_label = Label(results_frame, text='Acciónes', font=normal_font)
 actions_label.grid(row=0, column=2, sticky="we")
 
-
 prediction_value = Label(results_frame, text='-', font=normal_font_bold)
 prediction_value.grid(row=1, column=0, sticky="we")
 
-accuracy_value = Label(results_frame, text='-', font=normal_font_bold)
+prediction_value_forpdf = Label(results_frame, text='-', font=normal_font_bold)
+
+accuracy_value = Label(results_frame, text='-', font=medium_font_bold)
 accuracy_value.grid(row=1, column=1, sticky="we")
 
-#export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf, state='disabled')
-export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf)
+export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf, state='disabled')
+#export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf)
 export_pdf_button.grid(row=1, column=2, sticky="we")
 
 results_frame.grid_columnconfigure(0, weight=1)
