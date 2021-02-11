@@ -98,15 +98,15 @@ clf.fit(x_train, y_train)
 y_pred = clf.predict(x_train)
 
 # Crear matriz de confusion para obtener precision de la clasificación de cada etiqueta
-cm = confusion_matrix(y_train, y_pred)
-cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+confusion_matrix = confusion_matrix(y_train, y_pred)
+confusion_matrix = confusion_matrix.astype('float') / confusion_matrix.sum(axis=1)[:, np.newaxis]
 
-confusion_matrix = np.array(cm);
+#confusion_matrix = np.array(confusion_matrix);
 accuracy_positive = round(confusion_matrix[0][0], 4) * 100
 accuracy_negative = round(confusion_matrix[1][1], 4) * 100
 
 print('*** Matriz de confusion con scores')
-print(cm)
+print(confusion_matrix)
 print('*** Precision diagnostico positivo')
 print(accuracy_positive)
 print('*** Precision diagnostico negativo')
@@ -403,7 +403,8 @@ def save_as_pdf():
 	is_form_valid = validate_inputs()
 
 	# Verificar que todos los campos son validos antes de proceder
-	if is_form_valid:
+	#if is_form_valid:
+	if True:
 
 		# Obtener la ruta del directorio donde se guardará el archivo
 		directory_route = filedialog.askdirectory()
@@ -440,13 +441,17 @@ def save_as_pdf():
 			# Crear un nuevo PDF con reportlab
 			can = canvas.Canvas(packet, pagesize=letter)
 
+			# El punto se ubica por defecto en la esquina inferior izq cada vez que se va a escribir algo
 			# Poner tipo de letra Times tamaño 12 y escribir datos
-			# El punto se ubica por defecto en la esquina inferior izq
 			can.setFont('Times-Roman', 12)
-			can.drawString(6*cm, 22*cm, patient_name)
-			can.drawString(6*cm, 21*cm, patient_id)
+			#can.drawString(6*cm, 22*cm, patient_name)
+
+			
+			can.drawString(6*cm, 21*cm, 'GORREA HIJUEPUTA')
+			'''
 			can.drawString(17.3*cm, 22*cm, current_date)
 
+			# Poner tipo de letra Times tamaño 12 en negrilla y escribir datos
 			can.setFont('Times-Bold', 12)
 			can.drawString(4.587*cm, 19.569*cm, result_val)
 			can.drawString(4.587*cm, 18.412*cm, accuracy_val)
@@ -465,6 +470,7 @@ def save_as_pdf():
 			can.drawString(11.25*cm, 7.79*cm, heartrate)
 			can.drawString(11.25*cm, 7*cm, st_depression)
 			can.drawString(11.25*cm, 5.68*cm, flourosopy_val)
+			'''
 
 			can.save()
 
@@ -872,8 +878,8 @@ prediction_value.grid(row=1, column=0, sticky="we")
 accuracy_value = Label(results_frame, text='-', font=normal_font_bold)
 accuracy_value.grid(row=1, column=1, sticky="we")
 
-export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf, state='disabled')
-#export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf)
+#export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf, state='disabled')
+export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf)
 export_pdf_button.grid(row=1, column=2, sticky="we")
 
 results_frame.grid_columnconfigure(0, weight=1)
