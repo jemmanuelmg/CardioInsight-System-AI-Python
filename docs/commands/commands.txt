@@ -1,3 +1,5 @@
 ## Crear ejecutable del programa (ejecutar 'pip install pyinstaller' primero)
 
 pyinstaller.exe --onefile --windowed --icon=icon.ico program.py
+
+pyi-makespec --onefile --windowed --icon=icon.ico program.py
