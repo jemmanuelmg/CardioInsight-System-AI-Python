@@ -39,7 +39,7 @@ prediction_accuracy = "-"
 angina_map = {
 	'Angina Típica': 0,
 	'Angina Atípica': 1,
-	'Dolor No-Anginal': 2,
+	'Dolor No-Anginoso': 2,
 	'Asintomático': 3
 }
 
@@ -50,7 +50,7 @@ electrocardio_map = {
 }
 
 slope_map = {
-	'Ascendente (Rito cardíaco mejora con el ejercicio)': 0,
+	'Ascendente (Ritmo cardíaco mejora con el ejercicio)': 0,
 	'Plana (Cambio mínimo)': 1,
 	'Descendete (Signos de corazón enfermo)': 2
 }
@@ -462,11 +462,19 @@ def save_as_pdf():
 			existing_pdf = PdfFileReader(open("docs/PDF_Base.pdf", "rb"))
 			output = PdfFileWriter()
 
+			# Anexar paginas al pdf final
 			page = existing_pdf.getPage(0)
-			#page2 = existing_pdf.getPage(1)
 			page.mergePage(new_pdf.getPage(0))
 			output.addPage(page)
-			#output.addPage(page2)
+
+			page2 = existing_pdf.getPage(1)
+			output.addPage(page2)
+			
+			page3 = existing_pdf.getPage(2)
+			output.addPage(page3)
+
+			page4 = existing_pdf.getPage(3)
+			output.addPage(page4)
 
 			# Guardar el archivo en la ruta seleccionada con el nombre e ID del paciente
 			outputStream = open(directory_route + '/Resultados ' + patient_name + ' ' + patient_id + '.pdf', "wb")
@@ -581,7 +589,7 @@ age_subframe.pack(fill='x', expand=True, pady=(0, 10))
 ##
 angina_subframe = Frame(left_frame)
 
-label_angina = Label(angina_subframe, text="Tipo de Dolor Pectoral:", anchor='w', justify='left', font=normal_font)
+label_angina = Label(angina_subframe, text="Tipo de Dolor Torácico:", anchor='w', justify='left', font=normal_font)
 label_angina.grid(row=0, column=0, sticky="we", padx=(0, 8))
 
 combobox_angina = ttk.Combobox(angina_subframe, width = 32, textvariable = angina, state="readonly")
