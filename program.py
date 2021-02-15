@@ -434,8 +434,8 @@ def save_as_pdf():
 			can.drawString(17.3*cm, 22*cm, current_date)
 
 			can.setFont('Times-Bold', 12)
-			can.drawString(4.587*cm, 19.469*cm, result_val)
-			can.drawString(4.587*cm, 18.207*cm, accuracy_val)
+			can.drawString(4.587*cm, 20.469*cm, result_val)
+			can.drawString(4.587*cm, 18.507*cm, accuracy_val)
 
 			can.setFont('Times-Roman', 12)
 			can.drawString(11.25*cm, 16*cm, age)
