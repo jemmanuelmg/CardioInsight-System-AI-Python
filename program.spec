@@ -12,6 +12,7 @@ a = Analysis(['program.py'],
                     ('font/Raleway-Regular.ttf', 'font'),
                     ('img/heart-1.png', 'img'),
                     ('img/medicine-logo.png', 'img')
+                    ('img/icon.ico, 'img')
                     ],
              hiddenimports=[],
              hookspath=[],
