@@ -26,6 +26,26 @@ from reportlab.lib.units import cm
 from datetime import datetime
 
 root = Tk()
+
+# Configurar ventana para aparezca como pantalla completa
+root.state('zoomed')
+
+# Dar titulo a la ventana y poner logo. 
+# Menus superiores estan despues de funciones necesariamente
+root.title('Pronóstico Enfermedad del Corazon')
+root.iconbitmap('img/program-icon.ico')
+
+
+
+
+
+
+
+
+
+
+
+# Variables globales
 gender = StringVar(root, '1')
 angina = StringVar(root)
 electrocardio = StringVar(root)
@@ -80,6 +100,7 @@ large_font = Font(family='Raleway Medium', size=16)
 
 
 
+# Creación del motor de machine learning para realizar predicciones
 
 # Leer el dataset
 data = pd.read_csv('data/heart.csv')
@@ -122,6 +143,16 @@ print('The score')
 print(clf.score(x_test, y_test))
 '''
 
+
+
+
+
+
+
+
+
+
+# Funciones
 def predict_result():
 
 	# Obtener los valores a enviar a la SVM
@@ -170,6 +201,8 @@ def predict_result():
 
 	# Habilitar el boton para exportar resultados a pdf
 	export_pdf_button['state'] = 'normal'
+	export_pdf_button['bg']='#03506F'
+	export_pdf_button['fg']='#FFFFFF'
 
 
 def validate_inputs():
@@ -362,6 +395,82 @@ def show_help():
 def show_about_info():
 	pass
 
+def show_database():
+
+	database_window = Toplevel(root)
+	database_window.title("Base de Datos")
+	database_window.iconbitmap('img/program-icon.ico')
+	center_window(database_window)
+
+	# Este frame necesita ser global ya que su ventana 'padre' es database_window
+	# y esa ventana solo se crea dentro de esta funcion, cuando se llama 'Abrir base de datos'
+	# pero, ademas de lo anterior, tambien será accedida por otras funciones aparte de esta
+
+	search_frame = Frame(database_window)
+
+	# Labels e inputs para buscar
+
+	label_filtro_documento = Label(search_frame, text="Buscar por Documento:", anchor='w', font=normal_font)
+	label_filtro_nombre = Label(search_frame, text="Buscar por Nombre:", anchor='w', font=normal_font)
+
+	global entry_busqdocumento
+	global entry_busqnombre
+
+	entry_busqdocumento = Entry(search_frame)
+	entry_busqnombre= Entry(search_frame, width=50)
+
+	label_filtro_documento.grid(row=0, column=0, sticky="we")
+	entry_busqdocumento.grid(row=0, column=1, sticky="we")
+
+	label_filtro_nombre.grid(row=0, column=2, sticky="we", padx=(12,0))
+	entry_busqnombre.grid(row=0, column=3, sticky="we")
+
+	button_busqueda = Button(search_frame, text='Buscar', font=normal_font, bg='#03506F', fg='#FFFFFF')
+	button_busqueda.grid(row=0, column=4, sticky="we", padx=12)
+
+	search_frame.pack(pady=10, padx=10, fill="x")
+
+	# Frame contenedor de los registros
+
+	global database_frame
+	database_frame = Frame(database_window)
+
+	encabezado_cedula = Label(database_frame, text="Cedula Paciente", font=normal_font)
+	encabezado_nombres = Label(database_frame, text="Nombres Paciente", font=normal_font)
+	encabezado_fecha = Label(database_frame, text="Fecha Diagnóstico", font=normal_font)
+	encabezado_resultado = Label(database_frame, text="Resultado", font=normal_font)
+	encabezado_detalles = Label(database_frame, text="Detalles", font=normal_font)
+	encabezado_borrar = Label(database_frame, text="Borrar", font=normal_font)
+
+	encabezado_cedula.grid(row=0, column=0, sticky="we")
+	encabezado_nombres.grid(row=0, column=1, sticky="we")
+	encabezado_fecha.grid(row=0, column=2, sticky="we")
+	encabezado_resultado.grid(row=0, column=3, sticky="we")
+	encabezado_detalles.grid(row=0, column=4, sticky="we")
+	encabezado_borrar.grid(row=0, column=5, sticky="we")
+
+	database_frame.grid_columnconfigure(0, weight=1)
+	database_frame.grid_columnconfigure(1, weight=2)
+	database_frame.grid_columnconfigure(2, weight=1)
+	database_frame.grid_columnconfigure(3, weight=1)
+	database_frame.grid_columnconfigure(4, weight=1)
+	database_frame.grid_columnconfigure(5, weight=1)
+
+	database_frame.pack(pady=10, padx=10, fill="x")
+
+
+def center_window(window):
+
+	window_width = 1200
+	window_height = 600
+
+	screen_width = root.winfo_screenwidth()
+	screen_height = root.winfo_screenheight()
+
+	x = (screen_width / 2) - (window_width / 2)
+	y = (screen_height / 2) - (window_height / 2)
+
+	window.geometry(f'{window_width}x{window_height}+{int(x)}+{int(y)}')
 
 def start_progress_bar():
 
@@ -428,14 +537,13 @@ def save_as_pdf():
 			# El punto se ubica por defecto en la esquina inferior izq cada vez que se va a escribir algo
 			# Poner tipo de letra Times tamaño 12 y escribir datos
 			can.setFont('Times-Roman', 12)
-
 			can.drawString(6*cm, 22*cm, patient_name)
 			can.drawString(4.7*cm, 20.981*cm, patient_id)
 			can.drawString(17.3*cm, 22*cm, current_date)
 
 			can.setFont('Times-Bold', 12)
-			can.drawString(4.587*cm, 20.469*cm, result_val)
-			can.drawString(4.587*cm, 18.507*cm, accuracy_val)
+			can.drawString(4.587*cm, 19.617*cm, result_val)
+			can.drawString(4.587*cm, 18.407*cm, accuracy_val)
 
 			can.setFont('Times-Roman', 12)
 			can.drawString(11.25*cm, 16*cm, age)
@@ -488,7 +596,6 @@ def save_as_pdf():
 			# Si no se seleccionó ninguna ruta, mostrar mensaje de error
 			messagebox.showerror(title='Datos no exportados', message='No se ha seleccionado ninguna carpeta, porfavor seleccione un directorio válido')
 
-		
 
 
 
@@ -496,10 +603,7 @@ def save_as_pdf():
 
 
 
-
-# Configuración del elemento raíz de la ventana y menús superiores
-root.title('Pronóstico Enfermedad del Corazon')
-root.iconbitmap('img/program-icon.ico')
+# Menús superiores del programa
 
 main_menu = Menu(root)
 root.config(menu=main_menu)
@@ -508,17 +612,17 @@ file_menu = Menu(main_menu, tearoff=0)
 file_menu.add_command(label='Salir', command=root.quit)
 main_menu.add_cascade(label='Archivo', menu=file_menu)
 
+bd_menu = Menu(main_menu, tearoff=0)
+bd_menu.add_command(label='Abrir Base de Datos', command=show_database)
+main_menu.add_cascade(label='Base de Datos', menu=bd_menu)
+
 help_menu = Menu(main_menu, tearoff=0)
 help_menu.add_command(label='Mostrar Ayuda', command=show_help)
 main_menu.add_cascade(label='Ayuda', menu=help_menu)
 
-
 about_menu = Menu(main_menu, tearoff=0)
 about_menu.add_command(label='Acerca De...', command=show_about_info)
 main_menu.add_cascade(label='Información', menu=about_menu)
-
-# Configurar ventana para aparezca como pantalla completa
-root.state('zoomed')
 
 
 
@@ -844,7 +948,7 @@ container_frame.pack(fill="x", pady=(10, 7), padx=10)
 
 
 # Botones, barra de progreso y panel de resultados (zona inferior)
-main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=start_progress_bar, font=normal_font)
+main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=start_progress_bar, font=normal_font, bg='#03506F', fg='#FFFFFF')
 main_button.pack()
 
 progress_bar = ttk.Progressbar(main_frame, orient=HORIZONTAL, length=300, mode='indeterminate')

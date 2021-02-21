@@ -1,5 +1,7 @@
 import sqlite3
 
+# Al ejectar este script se crea el archivo de sqlite que contiene la bd
+
 # Crear conexion con BD, si no existe se crea
 conn = sqlite3.connect('CardioInsight.db')
 
