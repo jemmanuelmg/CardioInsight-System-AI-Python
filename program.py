@@ -26,6 +26,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import cm
 from datetime import datetime
+from functools import partial
 
 root = Tk()
 
@@ -461,7 +462,7 @@ def show_database():
 
 	database_frame.pack(pady=10, padx=10, fill="x")
 
-	do_query_and_refresh(all_fields=False)
+	do_query_and_refresh()
 
 def insert_record():
 
@@ -492,7 +493,6 @@ def insert_record():
 
 		db_path = os.path.join(BASE_DIR, "database/CardioInsight.db")
 		conn = sqlite3.connect(db_path)
-
 		cursor = conn.cursor()
 
 		insertion_string = f'''
@@ -500,24 +500,17 @@ def insert_record():
 		VALUES ('{patient_id}', '{patient_name}', '{current_date}', '{result_val}', '{accuracy_val}', {age}, '{gender_val}', '{anginapain_val}', {cholesterol}, '{angina_val}', '{slope}', {thalium_val}, {bloodp}, {sugar}, {heartrate}, {st_depression}, {flourosopy_val})
 		'''
 
-		cursor.execute(
-			insertion_string
-		)
+		cursor.execute(insertion_string)
 
 		conn.commit()
 
 
 
-def do_query_and_refresh(patient_id = None, patient_name = None, all_fields=False):
+def do_query_and_refresh(patient_id = None, patient_name = None):
 
 	global database_frame
-	base_query = ''
+	base_query = 'SELECT documento_paciente, nombre_paciente, fecha_diagnostico, resultado_diagnostico, id_diagnostico FROM Diagnosticos'
 	where_filter = ''
-
-	if all_fields:
-		base_query = 'SELECT * FROM Diagnosticos'
-	else:
-		base_query = 'SELECT documento_paciente, nombre_paciente, fecha_diagnostico, resultado_diagnostico, id_diagnostico FROM Diagnosticos'
 
 	if patient_id and patient_name:
 
@@ -535,14 +528,10 @@ def do_query_and_refresh(patient_id = None, patient_name = None, all_fields=Fals
 
 	db_path = os.path.join(BASE_DIR, "database/CardioInsight.db")
 	conn = sqlite3.connect(db_path)
-
 	cursor = conn.cursor()
 	cursor.execute(complete_query)
 
 	rows = cursor.fetchall()
-
-	print('## El resultado de la consulta')
-	print(rows)
 
 	i = 1
 	j = 0
@@ -553,14 +542,23 @@ def do_query_and_refresh(patient_id = None, patient_name = None, all_fields=Fals
 
 		for j in range(6):
 
+			id_diagnostico = row[4]
+
 			if j <= 3:
+
 				current_label = Label(database_frame, text=str(row[j]), anchor='w', font=normal_font)
 				current_label.grid(row=i, column=j, sticky='we')
+
 			elif j == 4:
-				current_detailbtn = Button(database_frame, text='Detalles', command=lambda: show_record_details(row[4]), font=normal_font, bg='#DDDDDD')
+
+				details_action = partial(show_record_details, id_diagnostico)
+				current_detailbtn = Button(database_frame, text='Detalles', command=details_action, font=normal_font, bg='#DDDDDD')
 				current_detailbtn.grid(row=i, column=j, sticky='we', padx=(0, 8))
+
 			elif j == 5:
-				current_deletebtn = Button(database_frame, text='Borrar', command=lambda: delete_record(row[4]), font=normal_font, bg='#DDDDDD')
+
+				delete_action = partial(delete_record, id_diagnostico)
+				current_deletebtn = Button(database_frame, text='Borrar', command=delete_action, font=normal_font, bg='#DDDDDD')
 				current_deletebtn.grid(row=i, column=j, sticky='we')
 				#print (field)
 		
@@ -580,6 +578,20 @@ def show_record_details(record_id):
 def delete_record(record_id):
 	print('$$$ Entro en delete_record')
 	print(record_id)
+
+	continue_delete = messagebox.askyesno(message='¿Borrar toda la información de este registro?', title="Confirmación")
+
+	if continue_delete:
+
+		db_path = os.path.join(BASE_DIR, "database/CardioInsight.db")
+		conn = sqlite3.connect(db_path)
+		cursor = conn.cursor()
+
+		delete_query = f'DELETE FROM Diagnosticos WHERE id_diagnostico = {record_id}'
+		cursor.execute(delete_query)
+		conn.commit()
+
+		do_query_and_refresh()
 
 
 def center_window(window):
