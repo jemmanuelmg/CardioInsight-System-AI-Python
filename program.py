@@ -604,10 +604,10 @@ def show_record_details(record_id):
 	rows = cursor.fetchall()
 	patient_record = rows[0]
 
-	container_frame = Frame(details_window)
+	container_frame = LabelFrame(details_window, text='Detalles del Registro', relief=RIDGE, font=normal_font)
 
-	label_ini = Label(container_frame, text="Detalles del Registro", anchor='w', justify='left', font=normal_font)
-	label_ini.pack(padx=10, pady=10)
+	#label_ini = Label(container_frame, text="Detalles del Registro", anchor='w', justify='left', font=normal_font)
+	#label_ini.pack(padx=10, pady=10)
 
 	label_1 = Label(container_frame, text="Documento del paciente: " + str(patient_record[1]), anchor='w', font=normal_font)
 	label_1.pack(padx=2, pady=2, fill='x')
@@ -663,7 +663,7 @@ def show_record_details(record_id):
 	label_18 = Label(container_frame, text="Precisión del Diagnóstico: " + str(patient_record[5]), anchor='w', font=normal_font)
 	label_18.pack(padx=2, pady=2, fill='x')
 
-	container_frame.pack(fill='both')
+	container_frame.pack(fill='both', padx=10, pady=10)
 
 
 
@@ -708,7 +708,7 @@ def center_window(window):
 
 def center_small_window(window):
 
-	window_width = 700
+	window_width = 710
 	window_height = 600
 
 	screen_width = root.winfo_screenwidth()
