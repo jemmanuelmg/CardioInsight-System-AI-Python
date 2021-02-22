@@ -592,6 +592,88 @@ def show_record_details(record_id):
 	print('>>> Entro en show_record_details')
 	print(record_id)
 
+	details_window = Toplevel(root)
+	details_window.title("Detalles del Registro")
+	details_window.iconbitmap('img/program-icon.ico')
+	center_small_window(details_window)
+
+	details_query = f'SELECT * FROM Diagnosticos WHERE id_diagnostico = {record_id} LIMIT 1'
+
+	db_path = os.path.join(BASE_DIR, "database/CardioInsight.db")
+	conn = sqlite3.connect(db_path)
+	cursor = conn.cursor()
+	cursor.execute(details_query)
+
+	rows = cursor.fetchall()
+	patient_record = rows[0]
+
+	container_frame = Frame(details_window)
+
+	label_1 = Label(container_frame, text="Documento del paciente: " + documento_paciente, anchor='w', justify='left', font=normal_font)
+	label_1.pack(padx=10, pady=10)
+
+	label_2 = Label(container_frame, text="Nombres del paciente: " + nombre_paciente, anchor='w', justify='left', font=normal_font)
+	label_2.pack(padx=10, pady=10)
+
+	label_3 = Label(container_frame, text="Fecha del Diagnóstico: " + fecha_diagnostico, anchor='w', justify='left', font=normal_font)
+	label_3.pack(padx=10, pady=10)
+
+
+	label_4 = Label(container_frame, text="Fecha del Diagnóstico: " + fecha_diagnostico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Edad: " + edad, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Género: " + genero, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Dolor Torácico: " + dolor_toracico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Colesterol Sérico: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="¿Angina Inducida por el Ejercicio?: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Pendiente del Segmento ST Durante Pico de Ejercicio: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Resultados Prueba de Estrés con Talio: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Presión Arterial en Reposo: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Nivel de Azucar en Ayunas: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Frecuencia Cardíaca Máxima Alcanzada: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Depresión de la Onda ST Inducida por Ejercicio: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+	label_4 = Label(container_frame, text="Número de Vasos Principales Coloreados por la Floración: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
+	label_4.pack(padx=10, pady=10)
+
+
+
+	label_5 = Label(container_frame, text="Resultado del Diagnóstico: " + resultado_diagnostico, anchor='w', justify='left', font=normal_font)
+	label_5.pack(padx=10, pady=10)
+
+	label_6 = Label(container_frame, text="Precisión del Diagnóstico: " + precision_diagnostico, anchor='w', justify='left', font=normal_font)
+	label_5.pack(padx=10, pady=10)
+
+	
+
+	
+
+	container_frame.pack(fill='both')
+
+
+
 def delete_record(record_id):
 
 	continue_delete = messagebox.askyesno(message='¿Borrar toda la información de este registro?', title="Confirmación")
@@ -622,6 +704,19 @@ def center_window(window):
 
 	window_width = 1200
 	window_height = 600
+
+	screen_width = root.winfo_screenwidth()
+	screen_height = root.winfo_screenheight()
+
+	x = (screen_width / 2) - (window_width / 2)
+	y = (screen_height / 2) - (window_height / 2)
+
+	window.geometry(f'{window_width}x{window_height}+{int(x)}+{int(y)}')
+
+def center_small_window(window):
+
+	window_width = 500
+	window_height = 500
 
 	screen_width = root.winfo_screenwidth()
 	screen_height = root.winfo_screenheight()
