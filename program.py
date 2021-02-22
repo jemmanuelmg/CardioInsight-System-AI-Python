@@ -1,10 +1,12 @@
 import time
 import io
+import os.path
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import tkinter as tk
+import sqlite3
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -46,6 +48,7 @@ root.iconbitmap('img/program-icon.ico')
 
 
 # Variables globales
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 gender = StringVar(root, '1')
 angina = StringVar(root)
 electrocardio = StringVar(root)
@@ -57,10 +60,10 @@ final_prediction = "-"
 prediction_accuracy = "-"
 
 angina_map = {
-	'Angina Típica': 0,
-	'Angina Atípica': 1,
+	'Angina Tipica': 0,
+	'Angina Atipica': 1,
 	'Dolor No-Anginoso': 2,
-	'Asintomático': 3
+	'Asintomatico': 3
 }
 
 electrocardio_map = {
@@ -70,8 +73,8 @@ electrocardio_map = {
 }
 
 slope_map = {
-	'Ascendente (Ritmo cardíaco mejora con el ejercicio)': 0,
-	'Plana (Cambio mínimo)': 1,
+	'Ascendente (Ritmo cardiaco mejora con el ejercicio)': 0,
+	'Plana (Cambio minimo)': 1,
 	'Descendete (Signos de corazón enfermo)': 2
 }
 
@@ -201,8 +204,7 @@ def predict_result():
 
 	# Habilitar el boton para exportar resultados a pdf
 	export_pdf_button['state'] = 'normal'
-	export_pdf_button['bg']='#03506F'
-	export_pdf_button['fg']='#FFFFFF'
+	save_db_button['state'] = 'normal'
 
 
 def validate_inputs():
@@ -397,6 +399,7 @@ def show_about_info():
 
 def show_database():
 
+	global database_window 
 	database_window = Toplevel(root)
 	database_window.title("Base de Datos")
 	database_window.iconbitmap('img/program-icon.ico')
@@ -457,6 +460,126 @@ def show_database():
 	database_frame.grid_columnconfigure(5, weight=1)
 
 	database_frame.pack(pady=10, padx=10, fill="x")
+
+	do_query_and_refresh(all_fields=False)
+
+def insert_record():
+
+	continue_saving = messagebox.askyesno(message='¿Guardar Registro en la Base de Datos?', title="Confirmación")
+
+	if continue_saving:
+
+		result_val = prediction_value_forpdf['text']
+		accuracy_val = str(accuracy_value['text']) + '%' 
+
+		patient_name = entry_patientname.get()
+		patient_id = entry_patientid.get()
+		current_date = str(datetime.date(datetime.now()))
+
+		age = entry_age.get()
+		gender_val = gender_map.get(gender.get())
+		angina_val = angina.get()
+		bloodp = entry_bloodp.get()
+		cholesterol = entry_cholesterol.get()
+		sugar = entry_sugar.get()
+		electrocardio_val = electrocardio.get()
+		heartrate = entry_heartrate.get()
+		anginapain_val = angina_pain_map.get(anginapain.get())
+		st_depression = entry_st_depression.get()
+		slope = slope_val.get()
+		flourosopy_val = flourosopy.get()
+		thalium_val = thalium.get()
+
+		db_path = os.path.join(BASE_DIR, "database/CardioInsight.db")
+		conn = sqlite3.connect(db_path)
+
+		cursor = conn.cursor()
+
+		insertion_string = f'''
+		INSERT INTO Diagnosticos (documento_paciente, nombre_paciente, fecha_diagnostico, resultado_diagnostico, precision_diagnostico, edad, genero, dolor_toracico, colesterol_serico, angina_ejercicio, st_pico_ejercicio, estres_talio, presion_reposo, azucar_ayunas, frecuencia_maxima, depresion_st, vasos_fluoracion)
+		VALUES ('{patient_id}', '{patient_name}', '{current_date}', '{result_val}', '{accuracy_val}', {age}, '{gender_val}', '{anginapain_val}', {cholesterol}, '{angina_val}', '{slope}', {thalium_val}, {bloodp}, {sugar}, {heartrate}, {st_depression}, {flourosopy_val})
+		'''
+
+		cursor.execute(
+			insertion_string
+		)
+
+		conn.commit()
+
+
+
+def do_query_and_refresh(patient_id = None, patient_name = None, all_fields=False):
+
+	global database_frame
+	base_query = ''
+	where_filter = ''
+
+	if all_fields:
+		base_query = 'SELECT * FROM Diagnosticos'
+	else:
+		base_query = 'SELECT documento_paciente, nombre_paciente, fecha_diagnostico, resultado_diagnostico, id_diagnostico FROM Diagnosticos'
+
+	if patient_id and patient_name:
+
+		where_filter = f' WHERE documento_paciente = {patient_id} AND nombre_paciente = {patient_name}'
+
+	elif patient_id:
+
+		where_filter = f' WHERE documento_paciente = {patient_id}'
+
+	elif patient_name:
+
+		where_filter = f' WHERE nombre_paciente = {patient_name}'
+	
+	complete_query = base_query + where_filter
+
+	db_path = os.path.join(BASE_DIR, "database/CardioInsight.db")
+	conn = sqlite3.connect(db_path)
+
+	cursor = conn.cursor()
+	cursor.execute(complete_query)
+
+	rows = cursor.fetchall()
+
+	print('## El resultado de la consulta')
+	print(rows)
+
+	i = 1
+	j = 0
+	for row in rows:
+
+		#print('>>> Empieza registro')
+
+
+		for j in range(6):
+
+			if j <= 3:
+				current_label = Label(database_frame, text=str(row[j]), anchor='w', font=normal_font)
+				current_label.grid(row=i, column=j, sticky='we')
+			elif j == 4:
+				current_detailbtn = Button(database_frame, text='Detalles', command=lambda: show_record_details(row[4]), font=normal_font, bg='#DDDDDD')
+				current_detailbtn.grid(row=i, column=j, sticky='we', padx=(0, 8))
+			elif j == 5:
+				current_deletebtn = Button(database_frame, text='Borrar', command=lambda: delete_record(row[4]), font=normal_font, bg='#DDDDDD')
+				current_deletebtn.grid(row=i, column=j, sticky='we')
+				#print (field)
+		
+		i += 1
+
+		#print('--Fin--')
+		#print(' ')
+
+	database_window.update_idletasks()
+
+
+
+def show_record_details(record_id):
+	print('>>> Entro en show_record_details')
+	print(record_id)
+
+def delete_record(record_id):
+	print('$$$ Entro en delete_record')
+	print(record_id)
 
 
 def center_window(window):
@@ -948,7 +1071,7 @@ container_frame.pack(fill="x", pady=(10, 7), padx=10)
 
 
 # Botones, barra de progreso y panel de resultados (zona inferior)
-main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=start_progress_bar, font=normal_font, bg='#03506F', fg='#FFFFFF')
+main_button = Button(main_frame, text='Calcular Pronóstico', width=20, command=start_progress_bar, font=normal_font, bg='#DDDDDD', fg='#000000')
 main_button.pack()
 
 progress_bar = ttk.Progressbar(main_frame, orient=HORIZONTAL, length=300, mode='indeterminate')
@@ -972,9 +1095,21 @@ prediction_value_forpdf = Label(results_frame, text='-', font=normal_font_bold)
 accuracy_value = Label(results_frame, text='-', font=medium_font_bold)
 accuracy_value.grid(row=1, column=1, sticky="we")
 
-export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf, state='disabled')
-#export_pdf_button = Button(results_frame, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf)
-export_pdf_button.grid(row=1, column=2, sticky="we")
+##
+save_button_subframe = Frame(results_frame)
+
+export_pdf_button = Button(save_button_subframe, text='Exportar Pronóstico a PDF', font=normal_font, command=save_as_pdf, state='disabled', bg='#DDDDDD')
+save_db_button = Button(save_button_subframe, text='Guardar en Base de Datos', font=normal_font, command=insert_record, state='disabled', bg='#DDDDDD')
+#save_db_button = Button(save_button_subframe, text='Guardar en Base de Datos', font=normal_font, command=do_query_and_refresh, bg='#DDDDDD')
+
+export_pdf_button.grid(row=0, column=0, sticky="we", padx=(0,8))
+save_db_button.grid(row=0, column=1, sticky="we")
+
+save_button_subframe.grid_columnconfigure(0, weight=1)
+save_button_subframe.grid_columnconfigure(1, weight=1)
+
+save_button_subframe.grid(row=1, column=2, sticky="we")
+##
 
 results_frame.grid_columnconfigure(0, weight=1)
 results_frame.grid_columnconfigure(1, weight=1)

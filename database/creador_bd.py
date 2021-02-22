@@ -1,7 +1,5 @@
 import sqlite3
 
-# Al ejectar este script se crea el archivo de sqlite que contiene la bd
-
 # Crear conexion con BD, si no existe se crea
 conn = sqlite3.connect('CardioInsight.db')
 
@@ -17,19 +15,21 @@ CREATE TABLE IF NOT EXISTS Diagnosticos (
     nombre_paciente TEXT,
     fecha_diagnostico TEXT,
     resultado_diagnostico TEXT,
+    precision_diagnostico TEXT,
     edad INTEGER,
     genero TEXT,
     dolor_toracico TEXT,
     colesterol_serico INTEGER,
-    angina_ejercicio INTEGER,
+    angina_ejercicio TEXT,
     st_pico_ejercicio TEXT,
     estres_talio INTEGER,
     presion_reposo INTEGER,
     azucar_ayunas INTEGER,
     frecuencia_maxima INTEGER,
     depresion_st NUMERIC,
-    vasos_fluoracion INTEGER,
-)'''
+    vasos_fluoracion INTEGER
+)
+'''
 )
 
 # Guardar cambios y generar archivo .db
