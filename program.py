@@ -452,7 +452,7 @@ def insert_record():
 	if continue_saving:
 
 		result_val = prediction_value_forpdf['text']
-		accuracy_val = str(accuracy_value['text']) + '%' 
+		accuracy_val = accuracy_value['text']
 
 		patient_name = entry_patientname.get()
 		patient_id = entry_patientid.get()
@@ -589,9 +589,6 @@ def do_query_and_refresh(patient_id = None, patient_name = None):
 
 def show_record_details(record_id):
 
-	print('>>> Entro en show_record_details')
-	print(record_id)
-
 	details_window = Toplevel(root)
 	details_window.title("Detalles del Registro")
 	details_window.iconbitmap('img/program-icon.ico')
@@ -609,66 +606,62 @@ def show_record_details(record_id):
 
 	container_frame = Frame(details_window)
 
-	label_1 = Label(container_frame, text="Documento del paciente: " + documento_paciente, anchor='w', justify='left', font=normal_font)
-	label_1.pack(padx=10, pady=10)
+	label_ini = Label(container_frame, text="Detalles del Registro", anchor='w', justify='left', font=normal_font)
+	label_ini.pack(padx=10, pady=10)
 
-	label_2 = Label(container_frame, text="Nombres del paciente: " + nombre_paciente, anchor='w', justify='left', font=normal_font)
-	label_2.pack(padx=10, pady=10)
+	label_1 = Label(container_frame, text="Documento del paciente: " + str(patient_record[1]), anchor='w', font=normal_font)
+	label_1.pack(padx=2, pady=2, fill='x')
 
-	label_3 = Label(container_frame, text="Fecha del Diagnóstico: " + fecha_diagnostico, anchor='w', justify='left', font=normal_font)
-	label_3.pack(padx=10, pady=10)
+	label_2 = Label(container_frame, text="Nombres del paciente: " + str(patient_record[2]), anchor='w', font=normal_font)
+	label_2.pack(padx=2, pady=2, fill='x')
 
+	label_3 = Label(container_frame, text="Fecha del Diagnóstico: " + str(patient_record[3]), anchor='w', font=normal_font)
+	label_3.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Fecha del Diagnóstico: " + fecha_diagnostico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_5 = Label(container_frame, text="Edad: " + str(patient_record[6]), anchor='w', font=normal_font)
+	label_5.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Edad: " + edad, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_6 = Label(container_frame, text="Género: " + str(patient_record[7]), anchor='w', font=normal_font)
+	label_6.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Género: " + genero, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_7 = Label(container_frame, text="Dolor Torácico: " + str(patient_record[8]), anchor='w', font=normal_font)
+	label_7.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Dolor Torácico: " + dolor_toracico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_8 = Label(container_frame, text="Colesterol Sérico: " + str(patient_record[9]), anchor='w', font=normal_font)
+	label_8.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Colesterol Sérico: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_9 = Label(container_frame, text="¿Angina Inducida por el Ejercicio?: " + str(patient_record[2]), anchor='w', font=normal_font)
+	label_9.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="¿Angina Inducida por el Ejercicio?: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_20 = Label(container_frame, text="Pendiente del Segmento ST Durante Pico de Ejercicio: " + str(patient_record[11]), anchor='w', font=normal_font)
+	label_20.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Pendiente del Segmento ST Durante Pico de Ejercicio: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_11 = Label(container_frame, text="Resultados Prueba de Estrés con Talio: " + str(patient_record[12]), anchor='w', font=normal_font)
+	label_11.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Resultados Prueba de Estrés con Talio: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_12 = Label(container_frame, text="Presión Arterial en Reposo: " + str(patient_record[13]), anchor='w', font=normal_font)
+	label_12.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Presión Arterial en Reposo: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_13 = Label(container_frame, text="Nivel de Azucar en Ayunas: " + str(patient_record[12]), anchor='w', font=normal_font)
+	label_13.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Nivel de Azucar en Ayunas: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_21 = Label(container_frame, text="Frecuencia Cardíaca Máxima Alcanzada: " + str(patient_record[15]), anchor='w', font=normal_font)
+	label_21.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Frecuencia Cardíaca Máxima Alcanzada: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_19 = Label(container_frame, text="Depresión de Onda ST Inducida por Ejercicio: " + str(patient_record[16]), anchor='w', font=normal_font)
+	label_19.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Depresión de la Onda ST Inducida por Ejercicio: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_15 = Label(container_frame, text="Azucar en Ayunas: " + str(patient_record[16]), anchor='w', font=normal_font)
+	label_15.pack(padx=2, pady=2, fill='x')
 
-	label_4 = Label(container_frame, text="Número de Vasos Principales Coloreados por la Floración: " + colesterol_serico, anchor='w', justify='left', font=normal_font)
-	label_4.pack(padx=10, pady=10)
+	label_16 = Label(container_frame, text="Número de Vasos Principales Coloreados por la Floración: " + str(patient_record[17]), anchor='w', font=normal_font)
+	label_16.pack(padx=2, pady=2, fill='x')
 
+	label_17 = Label(container_frame, text="Resultado del Diagnóstico: " + str(patient_record[2]), anchor='w', font=normal_font)
+	label_17.pack(padx=2, pady=2, fill='x')
 
-
-	label_5 = Label(container_frame, text="Resultado del Diagnóstico: " + resultado_diagnostico, anchor='w', justify='left', font=normal_font)
-	label_5.pack(padx=10, pady=10)
-
-	label_6 = Label(container_frame, text="Precisión del Diagnóstico: " + precision_diagnostico, anchor='w', justify='left', font=normal_font)
-	label_5.pack(padx=10, pady=10)
-
-	
-
-	
+	label_18 = Label(container_frame, text="Precisión del Diagnóstico: " + str(patient_record[5]), anchor='w', font=normal_font)
+	label_18.pack(padx=2, pady=2, fill='x')
 
 	container_frame.pack(fill='both')
 
@@ -715,8 +708,8 @@ def center_window(window):
 
 def center_small_window(window):
 
-	window_width = 500
-	window_height = 500
+	window_width = 700
+	window_height = 600
 
 	screen_width = root.winfo_screenwidth()
 	screen_height = root.winfo_screenheight()
@@ -978,7 +971,7 @@ cholesterol_subframe.pack(fill='x', expand=True, pady=(0, 10))
 ##
 electrocardio_subframe = Frame(left_frame)
 
-label_electrocardio = Label(electrocardio_subframe, text="Resultados Electrocariográficos en Reposo:", anchor='w', justify='left', font=normal_font)
+label_electrocardio = Label(electrocardio_subframe, text="Resultados Electrocardiográficos en Reposo:", anchor='w', justify='left', font=normal_font)
 label_electrocardio.grid(row=0, column=0, sticky="we", padx=(0, 8))
 
 combobox_electrocardio = ttk.Combobox(electrocardio_subframe, width = 32, textvariable = electrocardio, state="readonly")
