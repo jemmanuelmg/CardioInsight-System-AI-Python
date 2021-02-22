@@ -429,38 +429,19 @@ def show_database():
 	label_filtro_nombre.grid(row=0, column=2, sticky="we", padx=(12,0))
 	entry_busqnombre.grid(row=0, column=3, sticky="we")
 
-	button_busqueda = Button(search_frame, text='Buscar', font=normal_font, bg='#03506F', fg='#FFFFFF')
+	button_busqueda = Button(search_frame, text='Buscar', font=normal_font, command=filter_search, bg='#03506F', fg='#FFFFFF')
 	button_busqueda.grid(row=0, column=4, sticky="we", padx=12)
 
 	search_frame.pack(pady=10, padx=10, fill="x")
 
 	# Frame contenedor de los registros
 
+	global database_container
+	database_container = Frame(database_window)
+	database_container.pack(fill='both')
+
 	global database_frame
-	database_frame = Frame(database_window)
-
-	encabezado_cedula = Label(database_frame, text="Cedula Paciente", font=normal_font)
-	encabezado_nombres = Label(database_frame, text="Nombres Paciente", font=normal_font)
-	encabezado_fecha = Label(database_frame, text="Fecha Diagnóstico", font=normal_font)
-	encabezado_resultado = Label(database_frame, text="Resultado", font=normal_font)
-	encabezado_detalles = Label(database_frame, text="Detalles", font=normal_font)
-	encabezado_borrar = Label(database_frame, text="Borrar", font=normal_font)
-
-	encabezado_cedula.grid(row=0, column=0, sticky="we")
-	encabezado_nombres.grid(row=0, column=1, sticky="we")
-	encabezado_fecha.grid(row=0, column=2, sticky="we")
-	encabezado_resultado.grid(row=0, column=3, sticky="we")
-	encabezado_detalles.grid(row=0, column=4, sticky="we")
-	encabezado_borrar.grid(row=0, column=5, sticky="we")
-
-	database_frame.grid_columnconfigure(0, weight=1)
-	database_frame.grid_columnconfigure(1, weight=2)
-	database_frame.grid_columnconfigure(2, weight=1)
-	database_frame.grid_columnconfigure(3, weight=1)
-	database_frame.grid_columnconfigure(4, weight=1)
-	database_frame.grid_columnconfigure(5, weight=1)
-
-	database_frame.pack(pady=10, padx=10, fill="x")
+	database_frame = Frame(database_container)
 
 	do_query_and_refresh()
 
@@ -504,17 +485,57 @@ def insert_record():
 
 		conn.commit()
 
+		messagebox.showinfo("Información", "El registro se ha guardado exitosamente")
+
 
 
 def do_query_and_refresh(patient_id = None, patient_name = None):
 
+	# Referencia a Frames globales creados dentro de funcion show_database
+
+	global database_container
 	global database_frame
+
+	# Destruir el frame que muestra toda la tabla y los registros
+
+	database_frame.destroy()
+
+	# Volver a crear la tabla con sus encabezados
+
+	database_frame = Frame(database_container)
+
+	encabezado_cedula = Label(database_frame, text="Cedula Paciente", font=normal_font)
+	encabezado_nombres = Label(database_frame, text="Nombres Paciente", font=normal_font)
+	encabezado_fecha = Label(database_frame, text="Fecha Diagnóstico", font=normal_font)
+	encabezado_resultado = Label(database_frame, text="Resultado", font=normal_font)
+	encabezado_detalles = Label(database_frame, text="Detalles", font=normal_font)
+	encabezado_borrar = Label(database_frame, text="Borrar", font=normal_font)
+
+	encabezado_cedula.grid(row=0, column=0, sticky="we")
+	encabezado_nombres.grid(row=0, column=1, sticky="we")
+	encabezado_fecha.grid(row=0, column=2, sticky="we")
+	encabezado_resultado.grid(row=0, column=3, sticky="we")
+	encabezado_detalles.grid(row=0, column=4, sticky="we")
+	encabezado_borrar.grid(row=0, column=5, sticky="we")
+
+	database_frame.grid_columnconfigure(0, weight=1)
+	database_frame.grid_columnconfigure(1, weight=2)
+	database_frame.grid_columnconfigure(2, weight=1)
+	database_frame.grid_columnconfigure(3, weight=1)
+	database_frame.grid_columnconfigure(4, weight=1)
+	database_frame.grid_columnconfigure(5, weight=1)
+
+	database_frame.pack(pady=10, padx=10, fill="x")
+
+
+	# Consultar los registros
+
 	base_query = 'SELECT documento_paciente, nombre_paciente, fecha_diagnostico, resultado_diagnostico, id_diagnostico FROM Diagnosticos'
 	where_filter = ''
 
 	if patient_id and patient_name:
 
-		where_filter = f' WHERE documento_paciente = {patient_id} AND nombre_paciente = {patient_name}'
+		where_filter = f" WHERE documento_paciente = {patient_id} AND nombre_paciente LIKE '%{patient_name}%'"
 
 	elif patient_id:
 
@@ -522,7 +543,7 @@ def do_query_and_refresh(patient_id = None, patient_name = None):
 
 	elif patient_name:
 
-		where_filter = f' WHERE nombre_paciente = {patient_name}'
+		where_filter = f" WHERE nombre_paciente LIKE '%{patient_name}%'"
 	
 	complete_query = base_query + where_filter
 
@@ -533,12 +554,10 @@ def do_query_and_refresh(patient_id = None, patient_name = None):
 
 	rows = cursor.fetchall()
 
+	# Llenar la tabla usando ciclos sobre los regitros consultados previamente
 	i = 1
 	j = 0
 	for row in rows:
-
-		#print('>>> Empieza registro')
-
 
 		for j in range(6):
 
@@ -564,20 +583,16 @@ def do_query_and_refresh(patient_id = None, patient_name = None):
 		
 		i += 1
 
-		#print('--Fin--')
-		#print(' ')
-
 	database_window.update_idletasks()
 
 
 
 def show_record_details(record_id):
+
 	print('>>> Entro en show_record_details')
 	print(record_id)
 
 def delete_record(record_id):
-	print('$$$ Entro en delete_record')
-	print(record_id)
 
 	continue_delete = messagebox.askyesno(message='¿Borrar toda la información de este registro?', title="Confirmación")
 
@@ -593,6 +608,15 @@ def delete_record(record_id):
 
 		do_query_and_refresh()
 
+def filter_search():
+
+	global entry_busqdocumento
+	global entry_busqnombre	
+
+	document_param = entry_busqdocumento.get()
+	name_param = entry_busqnombre.get()
+
+	do_query_and_refresh(patient_id = document_param, patient_name = name_param)
 
 def center_window(window):
 
