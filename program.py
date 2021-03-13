@@ -535,11 +535,11 @@ def do_query_and_refresh(patient_id = None, patient_name = None):
 
 	if patient_id and patient_name:
 
-		where_filter = f" WHERE documento_paciente = {patient_id} AND nombre_paciente LIKE '%{patient_name}%'"
+		where_filter = f" WHERE documento_paciente = '{patient_id}' AND nombre_paciente LIKE '%{patient_name}%'"
 
 	elif patient_id:
 
-		where_filter = f' WHERE documento_paciente = {patient_id}'
+		where_filter = f" WHERE documento_paciente = '{patient_id}'"
 
 	elif patient_name:
 
@@ -630,7 +630,7 @@ def show_record_details(record_id):
 	label_8 = Label(container_frame, text="Colesterol Sérico: " + str(patient_record[9]), anchor='w', font=normal_font)
 	label_8.pack(padx=2, pady=2, fill='x')
 
-	label_9 = Label(container_frame, text="¿Angina Inducida por el Ejercicio?: " + str(patient_record[2]), anchor='w', font=normal_font)
+	label_9 = Label(container_frame, text="¿Angina Inducida por el Ejercicio?: " + str(patient_record[10]), anchor='w', font=normal_font)
 	label_9.pack(padx=2, pady=2, fill='x')
 
 	label_20 = Label(container_frame, text="Pendiente del Segmento ST Durante Pico de Ejercicio: " + str(patient_record[11]), anchor='w', font=normal_font)
@@ -642,7 +642,7 @@ def show_record_details(record_id):
 	label_12 = Label(container_frame, text="Presión Arterial en Reposo: " + str(patient_record[13]), anchor='w', font=normal_font)
 	label_12.pack(padx=2, pady=2, fill='x')
 
-	label_13 = Label(container_frame, text="Nivel de Azucar en Ayunas: " + str(patient_record[12]), anchor='w', font=normal_font)
+	label_13 = Label(container_frame, text="Nivel de Azucar en Ayunas: " + str(patient_record[14]), anchor='w', font=normal_font)
 	label_13.pack(padx=2, pady=2, fill='x')
 
 	label_21 = Label(container_frame, text="Frecuencia Cardíaca Máxima Alcanzada: " + str(patient_record[15]), anchor='w', font=normal_font)
@@ -651,13 +651,10 @@ def show_record_details(record_id):
 	label_19 = Label(container_frame, text="Depresión de Onda ST Inducida por Ejercicio: " + str(patient_record[16]), anchor='w', font=normal_font)
 	label_19.pack(padx=2, pady=2, fill='x')
 
-	label_15 = Label(container_frame, text="Azucar en Ayunas: " + str(patient_record[16]), anchor='w', font=normal_font)
-	label_15.pack(padx=2, pady=2, fill='x')
-
 	label_16 = Label(container_frame, text="Número de Vasos Principales Coloreados por la Floración: " + str(patient_record[17]), anchor='w', font=normal_font)
 	label_16.pack(padx=2, pady=2, fill='x')
 
-	label_17 = Label(container_frame, text="Resultado del Diagnóstico: " + str(patient_record[2]), anchor='w', font=normal_font)
+	label_17 = Label(container_frame, text="Resultado del Diagnóstico: " + str(patient_record[4]), anchor='w', font=normal_font)
 	label_17.pack(padx=2, pady=2, fill='x')
 
 	label_18 = Label(container_frame, text="Precisión del Diagnóstico: " + str(patient_record[5]), anchor='w', font=normal_font)
